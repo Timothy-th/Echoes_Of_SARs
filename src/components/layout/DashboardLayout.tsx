@@ -14,12 +14,12 @@ const DashboardLayout = () => {
 
   return (
     <div
-      className={`flex min-h-screen w-full overflow-x-hidden transition-colors duration-300 ${
+      className={`flex h-screen w-full overflow-hidden transition-colors duration-300 ${
         isDark ? "bg-[#0B1220] text-slate-100" : "bg-[#F5F7F2] text-slate-800"
       }`}
     >
       {/* Desktop Sidebar */}
-      <div className="hidden shrink-0 lg:block">
+      <div className="hidden h-full shrink-0 lg:block">
         <Sidebar />
       </div>
 
@@ -50,15 +50,20 @@ const DashboardLayout = () => {
       )}
 
       {/* Main Content */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Topbar */}
-        <div className="flex min-w-0 items-center">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Sticky Topbar */}
+        <header
+          className={`sticky top-0 z-40 flex shrink-0 items-center border-b transition-colors duration-300 ${
+            isDark
+              ? "border-slate-700/60 bg-[#111827]"
+              : "border-slate-200 bg-white"
+          }`}
+        >
+          {/* Mobile Menu */}
           <button
             onClick={() => setIsSidebarOpen(true)}
             className={`ml-3 shrink-0 rounded-lg p-2 lg:hidden ${
-              isDark
-                ? "bg-slate-800 text-white"
-                : "bg-white text-slate-800 shadow-sm"
+              isDark ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-800"
             }`}
             aria-label="Open navigation menu"
           >
@@ -68,11 +73,11 @@ const DashboardLayout = () => {
           <div className="min-w-0 flex-1">
             <Topbar />
           </div>
-        </div>
+        </header>
 
-        {/* Page Content */}
+        {/* Scrollable Page Content */}
         <main
-          className={`min-w-0 flex-1 p-3 transition-colors duration-300 sm:p-5 md:p-6 lg:p-8 ${
+          className={`min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-3 transition-colors duration-300 sm:p-5 md:p-6 lg:p-8 ${
             isDark ? "bg-[#0B1220]" : "bg-[#F5F7F2]"
           }`}
         >
