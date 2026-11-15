@@ -1,0 +1,121 @@
+{
+  "project": "NASA Forest Degradation Monitoring",
+  "study_area": "Bago Yoma vicinity, Myanmar",
+  "aoi": {
+    "bounds": {
+      "west": 95.9825,
+      "south": 18.945,
+      "east": 96.0775,
+      "north": 19.035
+    },
+    "crs": "EPSG:4326"
+  },
+  "coordinate_reference_systems": {
+    "GeoJSON": "EPSG:4326",
+    "GeoTIFF": "EPSG:32647",
+    "coordinate_order": "longitude, latitude"
+  },
+  "spatial_resolution": {
+    "source_pixel_size_m": 10,
+    "analysis_block_size_m": 50,
+    "geometry_source": "NISAR 10m grid grouped into 50m blocks"
+  },
+  "primary_sensor": "NISAR",
+  "datasets": {
+    "NISAR": {
+      "status": "USED",
+      "product": "GCOV L2",
+      "frequency": "L-band",
+      "polarization": [
+        "HH",
+        "HV"
+      ],
+      "track": "040 ascending",
+      "frame": "P05023",
+      "source_resolution_m": 10,
+      "analysis_block_size_m": 50,
+      "used_observation_dates": [
+        "2026-06-16",
+        "2026-07-10",
+        "2026-08-15",
+        "2026-09-08",
+        "2026-10-14"
+      ],
+      "excluded_observations": [
+        {
+          "date": "2026-11-07",
+          "reason": "Different frame P05036; excluded from the current P05023 time-series comparison."
+        }
+      ]
+    },
+    "GPM": {
+      "status": "USED_WITH_LIMITATIONS",
+      "product": "IMERG Late Daily V07C",
+      "resolution": "0.1 degree",
+      "role": "Regional rainfall context only",
+      "limitations": [
+        "Coarse resolution",
+        "Not suitable for individual 50m block evidence",
+        "Does not independently support RED classification"
+      ]
+    },
+    "SMAP": {
+      "status": "NO_VALID_AOI_RETRIEVAL_VERIFIED",
+      "product": "SPL3SMP_E V006",
+      "resolution": "9 km",
+      "tested_date": "2026-09-08",
+      "role": "Unavailable for valid AOI soil-moisture evidence",
+      "limitations": [
+        "No valid geolocation pixels verified in AOI",
+        "Fill values are not interpreted as zero soil moisture",
+        "Not used to change NISAR classification"
+      ]
+    },
+    "GEDI": {
+      "status": "NOT_VALIDATED",
+      "product": "GEDI L2A V003",
+      "role": "Potential historical vegetation structure context",
+      "limitations": [
+        "No local HDF5 shot-level data validated",
+        "Actual shot coordinates and quality not verified",
+        "Not used to support RED classification"
+      ]
+    }
+  },
+  "classification_counts": {
+    "GREEN": 39769,
+    "YELLOW": 163,
+    "RED": 0,
+    "GREY": 0
+  },
+  "classification_method": {
+    "basis": "NISAR dual-polarization temporal anomalies",
+    "polarizations": [
+      "HH",
+      "HV"
+    ],
+    "independent_evidence_required_for_red": true,
+    "independent_evidence_supported": false
+  },
+  "red_demo": {
+    "count": 2,
+    "separate_from_original_classification": true,
+    "source_classification": "YELLOW",
+    "demo_classification": "RED",
+    "confirmed_degradation": false,
+    "warning": "Demonstration only - not confirmed degradation."
+  },
+  "scientific_limitations": [
+    "RED does not represent confirmed degradation.",
+    "GREEN does not prove forest health.",
+    "YELLOW represents candidate anomalies requiring investigation.",
+    "GREY represents insufficient valid observations.",
+    "Supporting datasets do not independently upgrade RED."
+  ],
+  "export_validation": {
+    "frontend_json_validation": "PASSED",
+    "geojson_validation": "PASSED",
+    "geotiff_pixel_count_discrepancy": "UNRESOLVED - source GREEN count and raster GREEN count differ by 7 pixels."
+  },
+  "degradation_confirmed": false
+}

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#12241e">
+    <meta name="description" content="Compare Sentinel-2 NDVI vegetation change indicators for Central Bago Yoma in April 2020 and April 2026.">
+    <title>AETHERON — NDVI Temporal Comparison</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="AETHERON home">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span class="brand-name">AETHERON<span class="brand-sub">EARTH OBSERVATION</span></span>
+      </a>
+      <div class="topbar-title">
+        <p class="eyebrow">VEGETATION MONITORING / TEMPORAL COMPARISON</p>
+        <h1>AETHERON <span>— NDVI Temporal Comparison</span></h1>
+        <p class="subtitle">Central Bago Yoma | April 2020 vs April 2026</p>
+      </div>
+      <div class="live-status"><span class="status-dot"></span><span id="status-label">Loading imagery</span></div>
+    </header>
+
+    <main class="workspace">
+      <aside class="panel" aria-label="Map controls and NDVI legend">
+        <section class="location-card">
+          <div class="location-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg>
+          </div>
+          <div><p class="eyebrow">AREA OF INTEREST</p><h2>Central Bago Yoma</h2><p class="location-country">Myanmar · April 2020 vs April 2026</p></div>
+        </section>
+
+        <section class="panel-section">
+          <div class="section-heading"><span class="section-index">01</span><h2>Comparison view</h2></div>
+          <div class="mode-switch" role="group" aria-label="Choose NDVI comparison mode">
+            <button type="button" class="mode-button active" data-mode="swipe" aria-pressed="true">Swipe</button>
+            <button type="button" class="mode-button" data-mode="2020" aria-pressed="false">2020 only</button>
+            <button type="button" class="mode-button" data-mode="2026" aria-pressed="false">2026 only</button>
+          </div>
+          <p class="side-labels"><span>LEFT · APR 2020</span><span>RIGHT · APR 2026</span></p>
+
+          <p class="section-label">BASEMAP</p>
+          <div class="basemap-switch" role="group" aria-label="Choose basemap">
+            <button type="button" class="basemap-button active" data-basemap="satellite" aria-pressed="true">Satellite</button>
+            <button type="button" class="basemap-button" data-basemap="street" aria-pressed="false">OpenStreetMap</button>
+          </div>
+        </section>
+
+        <section class="panel-section layer-section">
+          <div class="section-heading"><span class="section-index">02</span><h2>Layer opacity</h2></div>
+          <div class="opacity-control">
+            <div class="range-label"><label for="opacity-2020">April 2020 NDVI</label><output id="opacity-2020-value" for="opacity-2020">90%</output></div>
+            <input id="opacity-2020" type="range" min="0" max="100" value="90" aria-label="April 2020 NDVI opacity">
+          </div>
+          <div class="opacity-control">
+            <div class="range-label"><label for="opacity-2026">April 2026 NDVI</label><output id="opacity-2026-value" for="opacity-2026">90%</output></div>
+            <input id="opacity-2026" type="range" min="0" max="100" value="90" aria-label="April 2026 NDVI opacity">
+          </div>
+        </section>
+
+        <section class="panel-section legend-section">
+          <div class="section-heading"><span class="section-index">03</span><h2>NDVI legend</h2></div>
+          <div class="legend-gradient" role="img" aria-label="Red and orange indicate low NDVI, yellow medium NDVI, and green high NDVI"></div>
+          <div class="legend-labels"><span>Low</span><span>Medium</span><span>High</span></div>
+          <div class="legend-values"><span>−0.2</span><span>0.45</span><span>0.9</span></div>
+          <p class="legend-note">Same fixed display scale for both years · NDVI</p>
+          <p class="ndvi-explainer">NDVI measures vegetation greenness from satellite red and near-infrared reflectance. Higher values generally indicate denser green vegetation.</p>
+        </section>
+
+        <section class="panel-section raster-section">
+          <div class="section-heading"><span class="section-index">04</span><h2>Aligned raster grid</h2></div>
+          <div class="detail-row"><span>Coordinate system</span><strong id="crs-value">—</strong></div>
+          <div class="detail-row"><span>Pixel grid</span><strong id="grid-value">—</strong></div>
+          <div class="detail-row"><span>2020 valid pixels</span><strong id="valid-2020">—</strong></div>
+          <div class="detail-row"><span>2026 valid pixels</span><strong id="valid-2026">—</strong></div>
+          <p class="source-note" id="raster-source">Preparing aligned year overlays…</p>
+        </section>
+
+        <div class="caution"><span class="caution-icon" aria-hidden="true">!</span><p><strong>Vegetation change indicator</strong>NDVI decreases can have multiple causes, including seasonality, moisture, harvest, fire, or cloud masking; they do not confirm deforestation.</p></div>
+        <p class="panel-footer">AETHERON <span>·</span> Sentinel-2 NDVI</p>
+      </aside>
+
+      <section class="map-shell" aria-label="Interactive Sentinel-2 NDVI comparison map">
+        <div id="map" role="application" aria-label="Swipe comparison of April 2020 and April 2026 NDVI in Central Bago Yoma, Myanmar"></div>
+        <div class="map-location"><span class="map-pin" aria-hidden="true"></span><span>Central Bago Yoma · Myanmar</span></div>
+        <div class="year-badge year-before">APRIL 2020</div>
+        <div class="year-badge year-after">APRIL 2026</div>
+        <div class="swipe-divider" id="swipe-divider">
+          <button type="button" class="swipe-handle" id="swipe-handle" role="slider" aria-label="Swipe between April 2020 and April 2026 imagery" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0">
+            <span aria-hidden="true">‹</span><span aria-hidden="true">›</span>
+          </button>
+        </div>
+        <div class="map-hint"><span class="hint-crosshair" aria-hidden="true">＋</span> Click map for both NDVI values and difference</div>
+        <div class="map-error" id="map-error" role="alert" hidden></div>
+      </section>
+    </main>
+  </body>
+</html>

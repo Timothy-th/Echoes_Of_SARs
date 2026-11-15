@@ -1,0 +1,23 @@
+{
+  "GREEN": {
+    "color": "#2E9D50",
+    "count": 39769,
+    "message": "No significant anomaly detected in valid observations. This does not prove forest health."
+  },
+  "YELLOW": {
+    "color": "#F2C94C",
+    "count": 163,
+    "message": "Candidate anomalies requiring further investigation."
+  },
+  "RED": {
+    "color": "#D93025",
+    "count": 0,
+    "demo_count": 2,
+    "message": "Demonstration only - not confirmed degradation."
+  },
+  "GREY": {
+    "color": "#808080",
+    "count": 0,
+    "message": "Insufficient valid observations."
+  }
+}

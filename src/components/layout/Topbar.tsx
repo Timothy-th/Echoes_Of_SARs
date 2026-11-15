@@ -1,9 +1,20 @@
 import ThemeToggle from "../common/ThemeToggle";
 import { useTheme } from "../../context/ThemeProvider";
+import { useLocation } from "react-router-dom";
+
+const pageTitles: Record<string, { section: string; title: string }> = {
+  "/monitor": { section: "Overview", title: "Forest Overview" },
+  "/map": { section: "Geospatial", title: "Monitoring Map" },
+  "/detection": { section: "Review", title: "Change Detection" },
+  "/analytics": { section: "Analysis", title: "Forest Analytics" },
+  "/sources": { section: "Project Data", title: "Data Sources" },
+};
 
 const Topbar = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { pathname } = useLocation();
+  const currentPage = pageTitles[pathname] ?? pageTitles["/monitor"];
 
   const colors = {
     header: isDark
@@ -30,11 +41,11 @@ const Topbar = () => {
         >
           <span>Workspace</span>
           <span>/</span>
-          <span className="font-semibold text-emerald-500">Overview</span>
+          <span className="font-semibold text-emerald-500">{currentPage.section}</span>
         </div>
 
         <h2 className={`font-heading text-xl font-bold ${colors.heading}`}>
-          Forest Overview
+          {currentPage.title}
         </h2>
       </div>
 

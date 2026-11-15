@@ -1,0 +1,180 @@
+{
+  "warning": "Demonstration only - not confirmed degradation.",
+  "total_clickable_zones": 2,
+  "zones": [
+    {
+      "demo_id": "DEMO_RED_001",
+      "source_zone_id": "NISAR_R00033_C00199",
+      "classification": "RED",
+      "color": "#D93025",
+      "demo_only": true,
+      "warning": "Demonstration only - not confirmed degradation.",
+      "source_classification": "YELLOW",
+      "source_block_ids": [
+        "B0033_0199",
+        "B0034_0200"
+      ],
+      "area_ha": 0.5,
+      "centroid": {
+        "longitude": 96.07607325480313,
+        "latitude": 19.021158909152845
+      },
+      "nisar_evidence": {
+        "sensor": "NISAR L-band",
+        "product": "GCOV L2",
+        "polarization": [
+          "HH",
+          "HV"
+        ],
+        "observation_dates": [
+          "2026-06-16",
+          "2026-07-10",
+          "2026-08-15",
+          "2026-09-08",
+          "2026-10-14"
+        ],
+        "mean_hh_magnitude_db": 2.1155,
+        "mean_hv_magnitude_db": 1.8818,
+        "mean_dual_agreement": 2.0,
+        "mean_spatial_coherence": 0.125
+      },
+      "supporting_datasets": {
+        "GPM": "Regional rainfall context only",
+        "SMAP": "No valid AOI soil moisture retrieval verified for 2026-09-08",
+        "GEDI": "Not validated at this zone"
+      },
+      "investigation_report": {
+        "title": "Forest Change Investigation",
+        "why_flagged": "This area was selected because NISAR HH and HV observations show candidate backscatter anomalies. The mean HH anomaly magnitude is 2.1155 dB and the mean HV anomaly magnitude is 1.8818 dB.",
+        "what_evidence_means": "The mean dual-polarization agreement is 2.0, indicating that HH and HV anomalies coincided in an average of 2.0 observation intervals. However, the mean spatial coherence is 0.125, indicating limited spatial support from neighboring blocks. This is a candidate signal, not proof of forest degradation.",
+        "possible_causes": [
+          "Canopy thinning or changes in vegetation structure",
+          "Tree removal or logging",
+          "Fire-related vegetation changes",
+          "Changes in surface moisture or other environmental conditions"
+        ],
+        "recommended_actions": [
+          "Compare satellite imagery across the five NISAR observation dates.",
+          "Inspect the location for tree removal, canopy damage or fire evidence.",
+          "Check local land-use changes and environmental conditions.",
+          "Record field observations and photographs with their locations."
+        ],
+        "evidence_gaps": [
+          "Independent evidence of degradation is not available.",
+          "GEDI vegetation structure data has not been validated at this zone.",
+          "Valid SMAP soil-moisture retrieval was not verified for the tested date.",
+          "GPM provides regional rainfall context only."
+        ]
+      },
+      "restoration_plan": {
+        "status": "PENDING_FIELD_VERIFICATION",
+        "decision": "Restoration should only be considered after field verification confirms forest degradation.",
+        "recommendations": [
+          "If no degradation is found, no restoration is required.",
+          "If natural recovery is possible, protect existing vegetation and allow natural regeneration.",
+          "If natural recovery is insufficient, consider assisted natural regeneration.",
+          "If severe forest damage is confirmed, consider reforestation with suitable native species."
+        ],
+        "additional_actions": [
+          "Prevent repeated logging and fire damage.",
+          "Protect soil and remaining vegetation.",
+          "Monitor vegetation recovery through field surveys and future satellite observations."
+        ],
+        "warning": "Do not initiate restoration solely because of a NISAR anomaly."
+      },
+      "assessment": {
+        "independent_evidence_supported": false,
+        "degradation_confirmed": false,
+        "recommendation": "Priority field inspection"
+      },
+      "clickable": true
+    },
+    {
+      "demo_id": "DEMO_RED_002",
+      "source_zone_id": "NISAR_R00094_C00196",
+      "classification": "RED",
+      "color": "#D93025",
+      "demo_only": true,
+      "warning": "Demonstration only - not confirmed degradation.",
+      "source_classification": "YELLOW",
+      "source_block_ids": [
+        "B0094_0196",
+        "B0095_0196"
+      ],
+      "area_ha": 0.5,
+      "centroid": {
+        "longitude": 96.0748942063121,
+        "latitude": 18.99360380169748
+      },
+      "nisar_evidence": {
+        "sensor": "NISAR L-band",
+        "product": "GCOV L2",
+        "polarization": [
+          "HH",
+          "HV"
+        ],
+        "observation_dates": [
+          "2026-06-16",
+          "2026-07-10",
+          "2026-08-15",
+          "2026-09-08",
+          "2026-10-14"
+        ],
+        "mean_hh_magnitude_db": 1.3803,
+        "mean_hv_magnitude_db": 1.9062,
+        "mean_dual_agreement": 2.0,
+        "mean_spatial_coherence": 0.125
+      },
+      "supporting_datasets": {
+        "GPM": "Regional rainfall context only",
+        "SMAP": "No valid AOI soil moisture retrieval verified for 2026-09-08",
+        "GEDI": "Not validated at this zone"
+      },
+      "investigation_report": {
+        "title": "Forest Change Investigation",
+        "why_flagged": "This area was selected because NISAR HH and HV observations show candidate backscatter anomalies. The mean HH anomaly magnitude is 1.3803 dB and the mean HV anomaly magnitude is 1.9062 dB.",
+        "what_evidence_means": "The mean dual-polarization agreement is 2.0, indicating that HH and HV anomalies coincided in an average of 2.0 observation intervals. However, the mean spatial coherence is 0.125, indicating limited spatial support from neighboring blocks. This is a candidate signal, not proof of forest degradation.",
+        "possible_causes": [
+          "Canopy thinning or changes in vegetation structure",
+          "Tree removal or logging",
+          "Fire-related vegetation changes",
+          "Changes in surface moisture or other environmental conditions"
+        ],
+        "recommended_actions": [
+          "Compare satellite imagery across the five NISAR observation dates.",
+          "Inspect the location for tree removal, canopy damage or fire evidence.",
+          "Check local land-use changes and environmental conditions.",
+          "Record field observations and photographs with their locations."
+        ],
+        "evidence_gaps": [
+          "Independent evidence of degradation is not available.",
+          "GEDI vegetation structure data has not been validated at this zone.",
+          "Valid SMAP soil-moisture retrieval was not verified for the tested date.",
+          "GPM provides regional rainfall context only."
+        ]
+      },
+      "restoration_plan": {
+        "status": "PENDING_FIELD_VERIFICATION",
+        "decision": "Restoration should only be considered after field verification confirms forest degradation.",
+        "recommendations": [
+          "If no degradation is found, no restoration is required.",
+          "If natural recovery is possible, protect existing vegetation and allow natural regeneration.",
+          "If natural recovery is insufficient, consider assisted natural regeneration.",
+          "If severe forest damage is confirmed, consider reforestation with suitable native species."
+        ],
+        "additional_actions": [
+          "Prevent repeated logging and fire damage.",
+          "Protect soil and remaining vegetation.",
+          "Monitor vegetation recovery through field surveys and future satellite observations."
+        ],
+        "warning": "Do not initiate restoration solely because of a NISAR anomaly."
+      },
+      "assessment": {
+        "independent_evidence_supported": false,
+        "degradation_confirmed": false,
+        "recommendation": "Priority field inspection"
+      },
+      "clickable": true
+    }
+  ]
+}

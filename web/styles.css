@@ -1,0 +1,152 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+:root {
+  color-scheme: light;
+  --forest: #18392e;
+  --forest-deep: #12241e;
+  --green: #376d53;
+  --muted: #78847c;
+  --line: #e8ebe6;
+  --paper: #fff;
+  --canvas: #f3f5f1;
+  font-family: "DM Sans", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: #23332b;
+  background: var(--canvas);
+}
+
+button, input { font: inherit; }
+[hidden] { display: none !important; }
+
+.topbar {
+  position: relative;
+  z-index: 500;
+  display: flex;
+  height: 78px;
+  align-items: center;
+  gap: 34px;
+  padding: 0 30px;
+  color: #f5f7f2;
+  background: var(--forest-deep);
+  box-shadow: 0 2px 12px #101c1733;
+}
+
+.brand { display: flex; min-width: 194px; align-items: center; gap: 11px; color: inherit; text-decoration: none; }
+.brand-mark { display: grid; width: 35px; height: 35px; place-items: center; border: 1px solid #7da787; border-radius: 10px 3px 10px 3px; color: #b6d2ac; font-family: Manrope, sans-serif; font-size: 20px; font-weight: 800; }
+.brand-name { font-family: Manrope, sans-serif; font-size: 13px; font-weight: 800; letter-spacing: .13em; }
+.brand-sub { display: block; margin-top: 3px; color: #90a197; font-family: "DM Mono", monospace; font-size: 8px; font-weight: 400; letter-spacing: .12em; }
+.topbar-title { flex: 1; }
+.eyebrow { margin: 0; color: #829087; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .13em; }
+.topbar-title h1 { margin: 4px 0 0; font-family: Manrope, sans-serif; font-size: 17px; font-weight: 600; letter-spacing: -.025em; }
+.topbar-title h1 span { color: #d3ddd4; font-weight: 500; }
+.subtitle { margin: 2px 0 0; color: #9cad9f; font-size: 9px; }
+.live-status { display: flex; align-items: center; gap: 9px; color: #cbd6cc; font-family: "DM Mono", monospace; font-size: 10px; white-space: nowrap; }
+.status-dot, .map-pin { width: 7px; height: 7px; border-radius: 50%; background: #d89c57; box-shadow: 0 0 0 3px #d89c5728; }
+
+.workspace { display: grid; height: calc(100vh - 78px); min-height: 600px; grid-template-columns: 330px minmax(0, 1fr); gap: 12px; padding: 12px; }
+.panel { position: relative; z-index: 400; display: flex; min-height: 0; flex-direction: column; overflow: auto; border: 1px solid #e8ebe6; border-radius: 8px; background: var(--paper); box-shadow: 0 2px 10px #24372d0a; }
+.location-card { display: flex; align-items: center; gap: 13px; padding: 21px 20px 19px; border-bottom: 1px solid var(--line); }
+.location-icon { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 12px; color: var(--green); background: #edf3eb; }
+.location-icon svg { width: 20px; fill: none; stroke: currentColor; stroke-width: 1.65; }
+.location-card .eyebrow { font-size: 8px; }
+.location-card h2 { margin: 5px 0 1px; font-family: Manrope, sans-serif; font-size: 16px; font-weight: 700; }
+.location-country { margin: 0; color: var(--muted); font-size: 10px; }
+.panel-section { padding: 17px 20px; border-bottom: 1px solid var(--line); }
+.section-heading { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+.section-index { color: #8ca392; font-family: "DM Mono", monospace; font-size: 9px; }
+.section-heading h2 { margin: 0; color: #27382f; font-family: Manrope, sans-serif; font-size: 12px; font-weight: 700; }
+.section-label { margin: 15px 0 8px; color: #89938d; font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .1em; }
+.mode-switch { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; padding: 3px; border-radius: 6px; background: #f2f4f0; }
+.mode-button, .basemap-button { min-height: 32px; border: 0; border-radius: 4px; color: #6d7971; background: transparent; cursor: pointer; font-size: 10px; transition: color .15s, background .15s, box-shadow .15s; }
+.mode-button.active, .basemap-button.active { color: #254533; background: #fff; box-shadow: 0 1px 4px #20352b20; font-weight: 700; }
+.mode-button:focus-visible, .basemap-button:focus-visible, input:focus-visible { outline: 2px solid #6c9b73; outline-offset: 2px; }
+.side-labels { display: flex; justify-content: space-between; margin: 10px 0 2px; color: #819087; font-family: "DM Mono", monospace; font-size: 8px; }
+.basemap-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; border-radius: 6px; background: #f2f4f0; }
+.opacity-control + .opacity-control { margin-top: 16px; }
+.range-label { display: flex; justify-content: space-between; margin-bottom: 8px; color: #6e7b72; font-size: 10px; }
+.range-label output { color: #345b43; font-family: "DM Mono", monospace; font-size: 10px; }
+input[type="range"] { display: block; width: 100%; height: 4px; accent-color: #4a7958; cursor: pointer; }
+.legend-gradient { height: 11px; border: 1px solid #4b47321c; border-radius: 3px; background: linear-gradient(90deg, #b03631 0%, #e98f48 29%, #f1dc70 59%, #83b567 78%, #237045 100%); }
+.legend-labels { display: flex; justify-content: space-between; margin-top: 8px; color: #616d65; font-size: 9px; }
+.legend-values { display: flex; justify-content: space-between; margin-top: 8px; color: #98a098; font-family: "DM Mono", monospace; font-size: 9px; }
+.legend-note { margin: 8px 0 0; color: #89938d; font-size: 9px; }
+.ndvi-explainer { margin: 9px 0 0; color: #758078; font-size: 9px; line-height: 1.5; }
+.raster-section .section-heading { margin-bottom: 10px; }
+.detail-row { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; color: #7c8880; font-size: 10px; }
+.detail-row strong { color: #46564b; font-family: "DM Mono", monospace; font-size: 9px; font-weight: 500; text-align: right; }
+.source-note { margin: 8px 0 0; color: #9aa39c; font-family: "DM Mono", monospace; font-size: 8px; line-height: 1.6; overflow-wrap: anywhere; }
+.caution { display: flex; gap: 10px; margin: 12px 14px 8px; padding: 11px; border: 1px solid #efe4d2; border-radius: 6px; background: #fcf8f0; }
+.caution-icon { display: grid; width: 17px; height: 17px; flex: 0 0 auto; place-items: center; border: 1px solid #d5a866; border-radius: 50%; color: #ae7a30; font-family: Georgia, serif; font-size: 11px; font-weight: 700; }
+.caution p { margin: 0; color: #776a54; font-size: 9px; line-height: 1.5; }
+.caution strong { display: block; margin-bottom: 3px; color: #765d37; font-size: 10px; }
+.panel-footer { margin: auto 20px 12px; padding-top: 10px; color: #a0a9a2; font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .04em; }
+.panel-footer span { padding: 0 3px; color: #bdc5bd; }
+
+.map-shell { position: relative; min-width: 0; min-height: 0; overflow: hidden; border: 1px solid #dfe4de; border-radius: 8px; background: #e8ece5; box-shadow: 0 2px 10px #24372d0a; }
+#map { width: 100%; height: 100%; background: #e8ece5; }
+.leaflet-container { font-family: "DM Sans", sans-serif; }
+.leaflet-control-zoom a { color: #294b39 !important; }
+.leaflet-control-attribution { font-size: 9px !important; }
+.leaflet-control-scale-line { border-color: #fff; color: #fff; background: #25352e66; font-size: 9px; text-shadow: 0 1px 2px #17231d; }
+.map-location { position: absolute; z-index: 400; top: 17px; left: 17px; display: flex; align-items: center; gap: 9px; padding: 10px 13px; border: 1px solid #ffffffb8; border-radius: 6px; color: #33463a; background: #fffffff0; box-shadow: 0 2px 12px #1c2a2030; font-size: 11px; font-weight: 600; pointer-events: none; backdrop-filter: blur(6px); }
+.map-location .map-pin { width: 8px; height: 8px; background: #4e8a5d; box-shadow: 0 0 0 3px #4e8a5d20; }
+.year-badge { position: absolute; z-index: 400; top: 75px; padding: 7px 10px; border: 1px solid #ffffffbd; border-radius: 4px; color: #34483a; background: #fffffff0; box-shadow: 0 2px 8px #1c2a2022; font-family: "DM Mono", monospace; font-size: 9px; font-weight: 500; letter-spacing: .06em; pointer-events: none; }
+.year-before { left: 17px; }
+.year-after { right: 17px; }
+.swipe-divider { position: absolute; z-index: 450; top: 0; bottom: 0; left: 50%; width: 2px; background: #fff; box-shadow: 0 0 4px #13231b88; pointer-events: none; }
+.swipe-handle { position: absolute; top: 50%; left: 50%; display: flex; width: 42px; height: 42px; align-items: center; justify-content: center; gap: 1px; transform: translate(-50%, -50%); border: 2px solid #fff; border-radius: 50%; color: #31523d; background: #fffffff2; box-shadow: 0 2px 10px #18281d55; cursor: ew-resize; font-size: 25px; line-height: 1; pointer-events: auto; touch-action: none; }
+.swipe-handle span + span { margin-left: -5px; }
+.swipe-handle:focus-visible { outline: 3px solid #6c9b73; outline-offset: 3px; }
+.map-hint { position: absolute; z-index: 400; right: 17px; bottom: 17px; display: flex; align-items: center; gap: 7px; padding: 9px 11px; border: 1px solid #ffffffa8; border-radius: 5px; color: #536259; background: #fffffff0; box-shadow: 0 2px 10px #1c2a2020; font-size: 10px; pointer-events: none; }
+.hint-crosshair { color: #50785e; font-size: 15px; }
+.map-error { position: absolute; z-index: 1000; inset: 50% auto auto 50%; width: min(440px, calc(100% - 32px)); padding: 15px 18px; transform: translate(-50%, -50%); border: 1px solid #e4c2b9; border-radius: 6px; color: #7c342d; background: #fff8f5; box-shadow: 0 5px 30px #172a2030; font-size: 12px; line-height: 1.55; }
+.sample-popup { display: grid; min-width: 230px; gap: 6px; }
+.sample-popup > strong { margin-bottom: 2px; color: #385943; font-size: 11px; }
+.sample-row { display: flex; justify-content: space-between; gap: 14px; color: #78847c; font-size: 10px; }
+.sample-row b { color: #263d30; font-family: "DM Mono", monospace; font-size: 10px; font-weight: 500; text-align: right; }
+.difference-row { padding-top: 6px; border-top: 1px solid #e8ebe6; }
+.sample-popup small { margin-top: 3px; color: #89938d; font-size: 9px; }
+
+@media (max-width: 760px) {
+  .topbar { height: 69px; gap: 14px; padding: 0 15px; }
+  .brand { min-width: auto; gap: 8px; }
+  .brand-mark { width: 31px; height: 31px; }
+  .brand-name { font-size: 11px; }
+  .brand-sub { font-size: 7px; }
+  .topbar-title { min-width: 0; }
+  .topbar-title .eyebrow { font-size: 7px; }
+  .topbar-title h1 { font-size: 12px; }
+  .subtitle { font-size: 8px; }
+  .live-status { gap: 6px; font-size: 8px; }
+  .workspace { position: relative; display: block; height: calc(100dvh - 69px); min-height: 570px; padding: 8px; }
+  .map-shell { position: absolute; inset: 8px; }
+  .panel { position: absolute; z-index: 460; top: 12px; left: 12px; width: min(310px, calc(100% - 24px)); max-height: min(65vh, 590px); border-radius: 7px; box-shadow: 0 5px 25px #18281d30; }
+  .location-card { padding: 13px 15px; }
+  .panel-section { padding: 13px 15px; }
+  .panel-footer { padding-top: 9px; }
+  .map-location { top: auto; bottom: 17px; left: 12px; padding: 8px 10px; font-size: 9px; }
+  .map-hint { right: 12px; bottom: 17px; max-width: 52%; padding: 7px 8px; font-size: 8px; }
+  .year-badge { top: 13px; padding: 6px 8px; font-size: 8px; }
+  .year-before { left: 12px; }
+  .year-after { right: 12px; }
+  .leaflet-bottom.leaflet-left { bottom: 48px; }
+}
+
+@media (max-width: 430px) {
+  .topbar { gap: 10px; padding: 0 10px; }
+  .brand-name { font-size: 10px; }
+  .topbar-title .eyebrow { display: none; }
+  .topbar-title h1 { max-width: 145px; line-height: 1.25; }
+  .topbar-title h1 span { display: block; font-size: 10px; }
+  .live-status { font-size: 7px; }
+  .map-hint { max-width: 48%; line-height: 1.3; }
+}

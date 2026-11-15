@@ -1,0 +1,122 @@
+{
+  "type": "FeatureCollection",
+  "name": "RED demonstration overlay",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "DEMO_RED_001",
+      "properties": {
+        "demo_id": "DEMO_RED_001",
+        "source_zone_id": "NISAR_R00033_C00199",
+        "source_classification": "YELLOW",
+        "demo_classification": "RED",
+        "color": "#D93025",
+        "demo_only": true,
+        "confirmed_degradation": false,
+        "clickable": true
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                96.07655565087535,
+                19.020715129370693
+              ],
+              [
+                96.07608115395611,
+                19.02070761753843
+              ],
+              [
+                96.07607325512248,
+                19.021158909355794
+              ],
+              [
+                96.07654775331909,
+                19.021166421379593
+              ],
+              [
+                96.07655565087535,
+                19.020715129370693
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                96.07607325512248,
+                19.021158909355794
+              ],
+              [
+                96.07559875714898,
+                19.02115139611672
+              ],
+              [
+                96.07559085681483,
+                19.021602687717344
+              ],
+              [
+                96.07606535606574,
+                19.02161020114798
+              ],
+              [
+                96.07607325512248,
+                19.021158909355794
+              ]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "DEMO_RED_002",
+      "properties": {
+        "demo_id": "DEMO_RED_002",
+        "source_zone_id": "NISAR_R00094_C00196",
+        "source_classification": "YELLOW",
+        "demo_classification": "RED",
+        "color": "#D93025",
+        "demo_only": true,
+        "confirmed_degradation": false,
+        "clickable": true
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              96.0751393051476,
+              18.993156261369283
+            ],
+            [
+              96.07466488697233,
+              18.99314875636578
+            ],
+            [
+              96.07465699664264,
+              18.9936000489514
+            ],
+            [
+              96.07464910608986,
+              18.994051341511877
+            ],
+            [
+              96.07512352681552,
+              18.994058846898593
+            ],
+            [
+              96.07513141609309,
+              18.99360755414651
+            ],
+            [
+              96.0751393051476,
+              18.993156261369283
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

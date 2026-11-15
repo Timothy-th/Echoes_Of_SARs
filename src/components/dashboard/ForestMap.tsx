@@ -2,307 +2,669 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { MapPin, Satellite, Layers3, Info } from "lucide-react";
+import { Layers3, Satellite, Eye, EyeOff, Info } from "lucide-react";
+
 import { useTheme } from "../../context/ThemeProvider";
 
-type MapStyle = "satellite";
+import {
+  classificationBanners,
+  classificationCounts,
+  loadBlockFeatures,
+  loadRedDemoOverlay,
+  projectMetadata,
+  redDemoDetails,
+  type Classification,
+} from "../../data/projectData";
 
-const mapLayers: Record<
-  MapStyle,
-  {
-    label: string;
-    url: string;
-    attribution: string;
-  }
-> = {
-  satellite: {
-    label: "Satellite",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution: "Tiles &copy; Esri",
-  },
+// ---------------------------------------------
+// CLASSIFICATION CONFIGURATION
+// ---------------------------------------------
+
+const classes: Classification[] = ["RED", "YELLOW", "GREEN", "GREY"];
+
+const colorByClass: Record<Classification, string> = {
+  RED: "#D93025",
+  YELLOW: "#F2C94C",
+  GREEN: "#2E9D50",
+  GREY: "#808080",
 };
+
+const boundsData = projectMetadata.aoi.bounds;
+
+const aoiBounds = L.latLngBounds(
+  [boundsData.south, boundsData.west],
+  [boundsData.north, boundsData.east],
+);
+
+// ---------------------------------------------
+// COORDINATE TOOLTIP
+// ---------------------------------------------
+
+const coordinatesLabel = (point: L.LatLng) =>
+  `Latitude: ${point.lat.toFixed(6)}<br/>Longitude: ${point.lng.toFixed(6)}`;
+
+// ---------------------------------------------
+// POPUP HELPERS
+// ---------------------------------------------
+
+const formatLabel = (key: string) =>
+  key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+
+const createPossibleCausesPopup = (demoId: string) => {
+  const zone = redDemoDetails.zones.find((item) => item.demo_id === demoId);
+
+  if (!zone) {
+    throw new Error(`No investigation details found for ${demoId}.`);
+  }
+
+  const content = document.createElement("div");
+  content.className = "forest-investigation-popup";
+
+  Object.assign(content.style, {
+    width: "100%",
+    maxWidth: "390px",
+    maxHeight: "420px",
+    overflowY: "auto",
+    overflowX: "hidden",
+    padding: "5px",
+    fontSize: "12px",
+    lineHeight: "1.6",
+    color: "#263A31",
+    fontFamily: "Arial, sans-serif",
+    boxSizing: "border-box",
+  });
+
+  // ---------------------------------------------
+  // POPUP TITLE
+  // ---------------------------------------------
+
+  const title = document.createElement("h3");
+
+  title.textContent = `${zone.demo_id} · Forest Investigation`;
+
+  Object.assign(title.style, {
+    fontSize: "16px",
+    fontWeight: "800",
+    margin: "0 0 12px",
+    color: "#D93025",
+    lineHeight: "1.4",
+  });
+
+  content.append(title);
+
+  // ---------------------------------------------
+  // WARNING BANNER
+  // ---------------------------------------------
+
+  const warning = document.createElement("div");
+
+  warning.textContent = `⚠ ${zone.warning}`;
+
+  Object.assign(warning.style, {
+    background: "#FEF2F2",
+    color: "#991B1B",
+    border: "1px solid #FECACA",
+    borderRadius: "8px",
+    padding: "10px",
+    marginBottom: "14px",
+    fontWeight: "600",
+    lineHeight: "1.5",
+  });
+
+  content.append(warning);
+
+  // ---------------------------------------------
+  // RECURSIVE JSON RENDERER
+  // Handles objects, arrays, strings, numbers,
+  // and boolean values.
+  // ---------------------------------------------
+
+  const renderValue = (
+    parent: HTMLElement,
+    key: string,
+    value: unknown,
+    depth = 0,
+  ): void => {
+    if (value === null || value === undefined) {
+      return;
+    }
+
+    const wrapper = document.createElement("div");
+
+    Object.assign(wrapper.style, {
+      marginTop: depth === 0 ? "13px" : "7px",
+      paddingLeft: depth > 0 ? "10px" : "0",
+      borderLeft: depth > 0 ? "2px solid #DCE6DA" : "none",
+    });
+
+    // -------------------------------------------
+    // NESTED OBJECT
+    // -------------------------------------------
+
+    if (typeof value === "object" && !Array.isArray(value)) {
+      const heading = document.createElement("div");
+
+      heading.textContent = formatLabel(key);
+
+      Object.assign(heading.style, {
+        fontSize: depth === 0 ? "13px" : "12px",
+        fontWeight: "800",
+        color: "#23734D",
+        borderBottom: "1px solid #DCE6DA",
+        paddingBottom: "5px",
+        marginBottom: "7px",
+      });
+
+      wrapper.append(heading);
+
+      Object.entries(value as Record<string, unknown>).forEach(
+        ([childKey, childValue]) => {
+          renderValue(wrapper, childKey, childValue, depth + 1);
+        },
+      );
+    }
+
+    // -------------------------------------------
+    // ARRAY
+    // -------------------------------------------
+    else if (Array.isArray(value)) {
+      const heading = document.createElement("strong");
+
+      heading.textContent = formatLabel(key);
+
+      Object.assign(heading.style, {
+        display: "block",
+        marginBottom: "5px",
+        color: "#334155",
+        fontSize: "12px",
+      });
+
+      wrapper.append(heading);
+
+      const list = document.createElement("ul");
+
+      Object.assign(list.style, {
+        paddingLeft: "18px",
+        margin: "4px 0",
+        listStyleType: "disc",
+      });
+
+      value.forEach((item) => {
+        const listItem = document.createElement("li");
+
+        Object.assign(listItem.style, {
+          marginBottom: "4px",
+          overflowWrap: "anywhere",
+        });
+
+        if (typeof item === "object" && item !== null) {
+          renderValue(listItem, "Details", item, depth + 1);
+        } else {
+          listItem.textContent = String(item);
+        }
+
+        list.append(listItem);
+      });
+
+      wrapper.append(list);
+    }
+
+    // -------------------------------------------
+    // SIMPLE VALUES
+    // -------------------------------------------
+    else {
+      const row = document.createElement("div");
+
+      Object.assign(row.style, {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        gap: "12px",
+        padding: "3px 0",
+      });
+
+      const label = document.createElement("span");
+
+      label.textContent = `${formatLabel(key)}:`;
+
+      Object.assign(label.style, {
+        fontWeight: "600",
+        color: "#64748B",
+        flex: "1",
+        minWidth: "0",
+      });
+
+      const result = document.createElement("span");
+
+      if (typeof value === "boolean") {
+        result.textContent = value ? "Yes" : "No";
+      } else {
+        result.textContent = String(value);
+      }
+
+      Object.assign(result.style, {
+        fontWeight: "600",
+        color: "#263A31",
+        textAlign: "right",
+        flex: "1.2",
+        minWidth: "0",
+        overflowWrap: "anywhere",
+      });
+
+      row.append(label, result);
+      wrapper.append(row);
+    }
+
+    parent.append(wrapper);
+  };
+
+  // ---------------------------------------------
+  // RENDER EVERY FIELD FROM THE ZONE DATA
+  // ---------------------------------------------
+
+  Object.entries(zone).forEach(([key, value]) => {
+    renderValue(content, key, value);
+  });
+
+  return content;
+};
+
+// ---------------------------------------------
+// FOREST MAP COMPONENT
+// ---------------------------------------------
 
 const ForestMap = () => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
   const mapElementRef = useRef<HTMLDivElement | null>(null);
+
   const mapRef = useRef<L.Map | null>(null);
-  const tileLayerRef = useRef<L.TileLayer | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
 
-  const [mapStyle, setMapStyle] = useState<MapStyle>("satellite");
-  const [clickMessage, setClickMessage] = useState(
-    "Click inside the orange boundary to select a location.",
-  );
+  const layersRef = useRef<
+    Partial<Record<Classification | "RED_DEMO", L.LayerGroup>>
+  >({});
 
-  // PNG image location.
-  // Put test.png inside your project's public folder.
-  const pngUrl = "/test.png";
+  const [visible, setVisible] = useState<
+    Record<Classification | "RED_DEMO", boolean>
+  >({
+    RED: true,
+    YELLOW: true,
+    GREEN: true,
+    GREY: true,
+    RED_DEMO: true,
+  });
 
-  // PNG geographic bounds.
-  // Format: [[South-West], [North-East]]
-  const rasterBounds = L.latLngBounds(
-    [34.237256, -119.689694],
-    [35.361633, -118.679124],
-  );
+  const visibleRef = useRef(visible);
 
-  // MAP INITIALIZATION
+  const [loading, setLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
+
+  // ---------------------------------------------
+  // INITIALIZE MAP AND LOAD DATA
+  // ---------------------------------------------
+
   useEffect(() => {
-    if (!mapElementRef.current || mapRef.current) return;
+    if (!mapElementRef.current || mapRef.current) {
+      return;
+    }
 
     const map = L.map(mapElementRef.current, {
-      center: [34.8, -119.18],
-      zoom: 9,
-      minZoom: 6,
-      maxZoom: 19,
-      scrollWheelZoom: true,
       zoomControl: true,
+      preferCanvas: true,
     });
 
     mapRef.current = map;
 
-    // PNG overlay
-    L.imageOverlay(pngUrl, rasterBounds, {
-      opacity: 0.85,
-      interactive: false,
-    }).addTo(map);
+    // Satellite basemap
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      {
+        attribution: "Tiles &copy; Esri",
+        maxZoom: 19,
+      },
+    ).addTo(map);
 
-    // Orange raster boundary
-    L.rectangle(rasterBounds, {
-      color: "#ff7800",
-      weight: 2,
-      dashArray: "5, 5",
-      fillOpacity: 0.05,
-    }).addTo(map);
-
-    // Automatically fit the map to the raster
-    map.fitBounds(rasterBounds, {
-      padding: [20, 20],
+    map.fitBounds(aoiBounds, {
+      padding: [18, 18],
     });
 
-    // MAP CLICK VALIDATION
-    const handleMapClick = (e: L.LeafletMouseEvent) => {
-      const clickedLocation = e.latlng;
+    let cancelled = false;
 
-      const lat = clickedLocation.lat.toFixed(6);
-      const lng = clickedLocation.lng.toFixed(6);
+    Promise.all([loadBlockFeatures(), loadRedDemoOverlay()])
+      .then(([blockData, demoData]) => {
+        if (cancelled) return;
 
-      if (rasterBounds.contains(clickedLocation)) {
-        // Remove previous marker
-        if (markerRef.current) {
-          map.removeLayer(markerRef.current);
-        }
-
-        // Add new marker
-        markerRef.current = L.marker(clickedLocation).addTo(map);
-
-        markerRef.current.bindPopup(`Lat: ${lat}<br>Lng: ${lng}`).openPopup();
-
-        // Zoom toward selected location
-        map.flyTo(clickedLocation, 10, {
-          animate: true,
-          duration: 2,
+        const renderer = L.canvas({
+          padding: 0.5,
         });
 
-        setClickMessage(`Selected location: ${lat}, ${lng}`);
-      } else {
-        setClickMessage(
-          "Invalid location. Please select a point inside the orange boundary.",
-        );
-      }
-    };
+        // ---------------------------------------
+        // CLASSIFICATION LAYERS
+        // ---------------------------------------
 
-    map.on("click", handleMapClick);
+        for (const classification of classes) {
+          const group = L.layerGroup();
 
+          blockData.features.forEach((feature) => {
+            if (feature.properties.classification !== classification) {
+              return;
+            }
+
+            const color =
+              feature.properties.color || colorByClass[classification];
+
+            const polygon = L.geoJSON(feature as unknown as GeoJSON.Feature, {
+              style: {
+                renderer,
+                color,
+                fillColor: color,
+                fillOpacity: classification === "YELLOW" ? 0.88 : 0.76,
+                weight: 0.55,
+              },
+            });
+
+            polygon.eachLayer((path) => {
+              if (!(path instanceof L.Polygon)) {
+                return;
+              }
+
+              path.bindTooltip("", {
+                sticky: true,
+                direction: "top",
+                opacity: 0.95,
+              });
+
+              path.on("mouseover", (event: L.LeafletMouseEvent) => {
+                path.setTooltipContent(coordinatesLabel(event.latlng));
+
+                path.openTooltip(event.latlng);
+              });
+
+              path.on("mousemove", (event: L.LeafletMouseEvent) => {
+                path.setTooltipContent(coordinatesLabel(event.latlng));
+              });
+            });
+
+            group.addLayer(polygon);
+          });
+
+          layersRef.current[classification] = group;
+
+          if (visibleRef.current[classification]) {
+            group.addTo(map);
+          }
+        }
+
+        // ---------------------------------------
+        // RED DEMONSTRATION DATA VALIDATION
+        // ---------------------------------------
+
+        if (
+          demoData.features.length !== 2 ||
+          redDemoDetails.zones.length !== 2
+        ) {
+          throw new Error(
+            "The RED demonstration map expects exactly two source features and two matching detail records.",
+          );
+        }
+
+        // ---------------------------------------
+        // RED DEMONSTRATION LAYER
+        // ---------------------------------------
+
+        const demoGroup = L.layerGroup();
+
+        demoData.features.forEach((feature) => {
+          const properties = feature.properties;
+
+          const demoId = String(properties.demo_id);
+
+          const polygon = L.geoJSON(feature as unknown as GeoJSON.Feature, {
+            style: {
+              renderer,
+              color: colorByClass.RED,
+              fillColor: colorByClass.RED,
+              fillOpacity: 0.78,
+              weight: 2,
+            },
+          });
+
+          // Full investigation popup
+          polygon.bindPopup(createPossibleCausesPopup(demoId), {
+            maxWidth: 430,
+            minWidth: 300,
+            maxHeight: 460,
+            autoPan: true,
+            closeButton: true,
+          });
+
+          demoGroup.addLayer(polygon);
+        });
+
+        layersRef.current.RED_DEMO = demoGroup;
+
+        if (visibleRef.current.RED_DEMO) {
+          demoGroup.addTo(map);
+        }
+
+        setLoading(false);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setDataError(
+            error instanceof Error ? error.message : "Unable to load map data.",
+          );
+
+          setLoading(false);
+        }
+      });
+
+    // ---------------------------------------------
     // CLEANUP
+    // ---------------------------------------------
+
     return () => {
-      map.off("click", handleMapClick);
+      cancelled = true;
+
       map.remove();
 
       mapRef.current = null;
-      tileLayerRef.current = null;
-      markerRef.current = null;
+      layersRef.current = {};
     };
   }, []);
 
-  // UPDATE BASE MAP WHEN SELECTOR CHANGES
-  useEffect(() => {
+  // ---------------------------------------------
+  // TOGGLE MAP LAYERS
+  // ---------------------------------------------
+
+  const toggleLayer = (key: Classification | "RED_DEMO") => {
+    const next = !visibleRef.current[key];
+
+    visibleRef.current = {
+      ...visibleRef.current,
+      [key]: next,
+    };
+
+    setVisible(visibleRef.current);
+
+    const group = layersRef.current[key];
     const map = mapRef.current;
 
-    if (!map) return;
+    if (!group || !map) return;
 
-    // Remove previous base layer
-    if (tileLayerRef.current) {
-      map.removeLayer(tileLayerRef.current);
+    if (next) {
+      group.addTo(map);
+    } else {
+      map.removeLayer(group);
     }
-
-    // Add selected base layer
-    const selectedLayer = mapLayers[mapStyle];
-
-    const newTileLayer = L.tileLayer(selectedLayer.url, {
-      attribution: selectedLayer.attribution,
-      maxZoom: 19,
-    });
-
-    newTileLayer.addTo(map);
-    tileLayerRef.current = newTileLayer;
-
-    // Keep PNG overlay and boundary above the base layer.
-    // They remain on the map when the base style changes.
-  }, [mapStyle]);
-
-  const colors = {
-    card: isDark
-      ? "border-slate-800 bg-[#111827]"
-      : "border-[#dce6da] bg-white",
-
-    heading: isDark ? "text-slate-100" : "text-[#263a31]",
-    body: isDark ? "text-slate-300" : "text-[#52665a]",
-    muted: isDark ? "text-slate-500" : "text-[#849286]",
-
-    divider: isDark ? "border-slate-800" : "border-[#e1e9df]",
-
-    controls: isDark
-      ? "border-slate-800 bg-[#0B1220]/50"
-      : "border-[#e1e9df] bg-[#f5f8f2]",
-
-    buttonGroup: isDark
-      ? "border-slate-700/80 bg-[#111827]"
-      : "border-[#dce6da] bg-white",
-
-    inactiveButton: isDark
-      ? "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-      : "text-[#647568] hover:bg-[#eef3eb] hover:text-[#263a31]",
-
-    footer: isDark ? "bg-[#0B1220]/60" : "bg-[#f5f8f2]",
-
-    mapBackground: isDark ? "bg-[#0B1220]" : "bg-[#e8eee7]",
   };
+
+  // ---------------------------------------------
+  // THEME STYLES
+  // ---------------------------------------------
+
+  const panel = isDark
+    ? "border-slate-700 bg-slate-950/90 text-slate-100"
+    : "border-white/80 bg-white/95 text-[#263a31]";
+
+  const secondary = isDark ? "text-slate-400" : "text-[#647568]";
+
+  // ---------------------------------------------
+  // UI
+  // ---------------------------------------------
 
   return (
     <section
-      className={`overflow-hidden rounded-2xl border shadow-lg transition-colors duration-300 ${colors.card} ${
-        isDark ? "shadow-black/10" : "shadow-ink/5"
+      className={`overflow-hidden rounded-2xl border shadow-lg ${
+        isDark ? "border-slate-800 bg-[#111827]" : "border-[#dce6da] bg-white"
       }`}
     >
       {/* HEADER */}
-      <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
+
+      <header className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
         <div>
           <div
             className={`mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[1.8px] ${
               isDark ? "text-emerald-400" : "text-emerald-700"
             }`}
           >
-            <MapPin size={14} />
-            Geographic Monitoring
+            <Satellite size={14} />
+            NISAR Classification Map
           </div>
 
-          <h2 className={`font-heading text-lg font-bold ${colors.heading}`}>
-            Central Bago Yoma
+          <h2
+            className={
+              isDark
+                ? "font-heading text-lg font-bold text-slate-100"
+                : "font-heading text-lg font-bold text-ink"
+            }
+          >
+            {projectMetadata.study_area}
           </h2>
 
-          <p className={`mt-1 text-xs ${colors.muted}`}>
-            Satellite imagery and raster overlay visualization
+          <p className={`mt-1 text-xs ${secondary}`}>
+            {Object.values(classificationBanners)
+              .reduce((sum, item) => sum + item.count, 0)
+              .toLocaleString()}{" "}
+            analyzed 50 m blocks · NISAR {projectMetadata.datasets.NISAR.frame}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+        <span
+          className={`rounded-lg border px-3 py-2 text-[10px] font-bold ${panel}`}
+        >
+          EPSG:4326 · {projectMetadata.aoi.crs}
+        </span>
+      </header>
 
-          <span
-            className={`text-[10px] font-bold tracking-wide ${
-              isDark ? "text-amber-400" : "text-amber-700"
-            }`}
-          >
-            LOCATION PREVIEW
-          </span>
-        </div>
-      </div>
+      {/* LAYER CONTROLS */}
 
-      {/* MAP CONTROLS */}
       <div
-        className={`flex flex-wrap items-center justify-between gap-3 border-y px-6 py-3 ${colors.divider} ${colors.controls}`}
+        className={`border-y px-6 py-3 ${
+          isDark
+            ? "border-slate-800 bg-[#0B1220]/50"
+            : "border-[#e1e9df] bg-[#f5f8f2]"
+        }`}
       >
         <div
-          className={`flex items-center gap-2 text-xs font-semibold ${colors.body}`}
+          className={`mb-2 flex items-center gap-2 text-xs font-semibold ${secondary}`}
         >
-          <Layers3
-            size={15}
-            className={isDark ? "text-emerald-400" : "text-emerald-700"}
-          />
-          Base Map
+          <Layers3 size={15} />
+          Hover GREEN/YELLOW for coordinates · click a RED demo area for full
+          investigation details
         </div>
 
-        <div
-          className={`flex flex-wrap items-center gap-1 rounded-xl border p-1 ${colors.buttonGroup}`}
-        >
-          {(Object.keys(mapLayers) as MapStyle[]).map((style) => (
-            <button
-              key={style}
-              type="button"
-              onClick={() => setMapStyle(style)}
-              aria-pressed={mapStyle === style}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
-                mapStyle === style
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-950/20"
-                  : colors.inactiveButton
-              }`}
-            >
-              {style === "satellite" && <Satellite size={14} />}
+        <div className="flex flex-wrap gap-2">
+          {classes.map((classification) => {
+            const banner = classificationBanners[classification];
 
-              {mapLayers[style].label}
-            </button>
-          ))}
+            const count = classificationCounts[classification];
+
+            return (
+              <button
+                key={classification}
+                type="button"
+                onClick={() => toggleLayer(classification)}
+                aria-pressed={visible[classification]}
+                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${panel}`}
+              >
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{
+                    backgroundColor: banner.color,
+                  }}
+                />
+
+                {classification}
+
+                <span className={secondary}>{count.toLocaleString()}</span>
+
+                {visible[classification] ? (
+                  <Eye size={13} />
+                ) : (
+                  <EyeOff size={13} />
+                )}
+              </button>
+            );
+          })}
+
+          <button
+            type="button"
+            onClick={() => toggleLayer("RED_DEMO")}
+            aria-pressed={visible.RED_DEMO}
+            className={`flex items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-xs ${panel}`}
+          >
+            <span className="h-2.5 w-2.5 rounded-sm bg-red-600" />
+            RED demonstration areas ({redDemoDetails.zones.length})
+            {visible.RED_DEMO ? <Eye size={13} /> : <EyeOff size={13} />}
+          </button>
         </div>
       </div>
 
       {/* MAP */}
-      <div className={`relative h-95 w-full ${colors.mapBackground}`}>
+
+      <div
+        className={`relative h-[min(70vh,620px)] min-h-[380px] w-full ${
+          isDark ? "bg-[#0B1220]" : "bg-[#e8eee7]"
+        }`}
+      >
         <div ref={mapElementRef} className="z-0 h-full w-full" />
 
-        {/* ZOOM GUIDE */}
+        {(loading || dataError) && (
+          <div
+            className={`pointer-events-none absolute left-4 top-4 z-[1000] rounded-lg border px-3 py-2 text-xs ${panel}`}
+          >
+            {loading ? "Loading classification layers..." : dataError}
+          </div>
+        )}
+
         <div
-          className={`pointer-events-none absolute bottom-4 right-4 z-1000 rounded-lg border px-3 py-2 text-[10px] shadow-lg ${
-            isDark
-              ? "border-white/10 bg-[#0B1220]/85 text-slate-300"
-              : "border-[#dce6da] bg-white/90 text-[#52665a]"
-          }`}
+          className={`pointer-events-none absolute bottom-4 right-4 z-[1000] rounded-lg border px-3 py-2 text-[10px] shadow-lg ${panel}`}
         >
           Scroll to zoom
         </div>
       </div>
 
-      {/* CLICK STATUS */}
-      <div
-        className={`flex items-start gap-3 border-t px-6 py-3 ${colors.divider} ${colors.controls}`}
+      {/* FOOTER */}
+
+      <footer
+        className={`flex items-start gap-3 border-t px-6 py-4 ${
+          isDark
+            ? "border-slate-800 bg-[#0B1220]/60"
+            : "border-[#e1e9df] bg-[#f5f8f2]"
+        }`}
       >
-        <MapPin
-          size={14}
-          className={`mt-0.5 shrink-0 ${
-            clickMessage.startsWith("Invalid")
-              ? "text-rose-400"
-              : "text-emerald-500"
-          }`}
-        />
+        <Info size={15} className={`mt-0.5 shrink-0 ${secondary}`} />
 
-        <p className={`text-[10px] leading-relaxed ${colors.muted}`}>
-          {clickMessage}
+        <p className={`text-[10px] leading-relaxed ${secondary}`}>
+          GREEN means no significant anomaly detected and does not prove forest
+          health. YELLOW marks candidate anomalies for investigation. There are
+          no RED blocks in the source classification; the two RED demonstration
+          areas preserve their separate source geometries and are unconfirmed.{" "}
+          {projectMetadata.spatial_resolution.geometry_source}.
         </p>
-      </div>
-
-      {/* MAP INFORMATION */}
-      <div
-        className={`flex items-start gap-3 border-t px-6 py-4 ${colors.divider} ${colors.footer}`}
-      >
-        <Info size={15} className={`mt-0.5 shrink-0 ${colors.muted}`} />
-
-        <p className={`text-[10px] leading-relaxed ${colors.muted}`}>
-          The PNG image is displayed as a geographic overlay using its assigned
-          coordinates. The orange rectangle represents its raster boundary.
-          Selected points are accepted only within this boundary.
-        </p>
-      </div>
+      </footer>
     </section>
   );
 };
