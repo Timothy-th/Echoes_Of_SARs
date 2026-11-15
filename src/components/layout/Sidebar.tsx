@@ -12,6 +12,10 @@ import {
 import { useTheme } from "../../context/ThemeProvider";
 import logo from "../../assets/image/Echoes of SARs Nature-Satellite Logo.png";
 
+type SidebarProps = {
+  onNavigate?: () => void;
+};
+
 const navigation = [
   {
     label: "Forest Overview",
@@ -40,7 +44,7 @@ const navigation = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ onNavigate }: SidebarProps) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -72,12 +76,12 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`sticky top-0 flex h-screen w-65 shrink-0 flex-col border-r px-5 py-6 transition-colors duration-300 ${colors.sidebar}`}
+      className={`flex h-full min-h-0 w-64 shrink-0 flex-col overflow-y-auto border-r px-4 py-5 sm:px-5 sm:py-6 transition-colors duration-300 ${colors.sidebar}`}
     >
       {/* Project Logo */}
-      <div className="mb-10 flex items-center gap-3 px-2">
+      <div className="mb-8 flex shrink-0 items-center gap-3 px-2 sm:mb-10">
         <div
-          className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border p-1.5 shadow-md ${
+          className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border p-1.5 shadow-md ${
             isDark
               ? "border-white/10 shadow-black/20"
               : "border-slate-200 shadow-slate-200/50"
@@ -86,17 +90,17 @@ const Sidebar = () => {
           <img
             src={logo}
             alt="Echoes of SARs logo"
-            className="block h-full w-full object-contain object-center"
+            className="h-full w-full object-contain"
           />
         </div>
 
         <div className="min-w-0">
-          <h1 className="font-heading text-lg font-extrabold tracking-tight text-emerald-500">
+          <h1 className="font-heading text-base font-extrabold tracking-tight text-emerald-500 sm:text-lg">
             Echoes of SARs
           </h1>
 
           <p
-            className={`mt-0.5 text-[10px] font-semibold uppercase tracking-[1.8px] ${colors.heading}`}
+            className={`mt-0.5 text-[9px] font-semibold uppercase tracking-[1.5px] ${colors.heading}`}
           >
             Forest Intelligence
           </p>
@@ -105,13 +109,13 @@ const Sidebar = () => {
 
       {/* Navigation Heading */}
       <div
-        className={`mb-3 px-3 text-[10px] font-bold uppercase tracking-[1.8px] ${colors.heading}`}
+        className={`mb-3 shrink-0 px-3 text-[10px] font-bold uppercase tracking-[1.8px] ${colors.heading}`}
       >
         Monitoring Workspace
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col gap-1">
+      <nav className="flex shrink-0 flex-col gap-1">
         {navigation.map((item) => {
           const Icon = item.icon;
 
@@ -119,22 +123,27 @@ const Sidebar = () => {
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={onNavigate}
               className={({ isActive }) =>
-                `group flex items-center gap-3 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all duration-200 ${
+                `group flex min-w-0 items-center gap-3 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all duration-200 ${
                   isActive
-                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 shadow-sm dark:text-emerald-400"
                     : `border-transparent ${colors.inactive}`
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={19} strokeWidth={isActive ? 2.3 : 1.8} />
+                  <Icon
+                    size={19}
+                    className="shrink-0"
+                    strokeWidth={isActive ? 2.3 : 1.8}
+                  />
 
-                  <span>{item.label}</span>
+                  <span className="min-w-0 flex-1 truncate">{item.label}</span>
 
                   {isActive && (
-                    <span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.7)]" />
                   )}
                 </>
               )}
@@ -145,7 +154,7 @@ const Sidebar = () => {
 
       {/* Project Information */}
       <div
-        className={`rounded-2xl border p-4 transition-colors duration-300 ${colors.infoCard}`}
+        className={`mt-auto shrink-0 rounded-2xl border p-4 transition-colors duration-300 ${colors.infoCard} ${"mt-8"}`}
       >
         <div className="mb-3 flex items-center gap-2 text-emerald-500">
           <Leaf size={17} />
@@ -173,14 +182,17 @@ const Sidebar = () => {
       {/* Public Website Link */}
       <Link
         to="/"
-        className={`mt-4 flex items-center justify-between rounded-xl px-3 py-3 text-xs font-semibold transition ${colors.link}`}
+        onClick={onNavigate}
+        className={`mt-4 flex shrink-0 items-center justify-between rounded-xl px-3 py-3 text-xs font-semibold transition ${colors.link}`}
       >
         <span>Visit Public Website</span>
         <ArrowUpRight size={16} />
       </Link>
 
       {/* Copyright */}
-      <div className={`mt-3 text-center text-[10px] ${colors.copyright}`}>
+      <div
+        className={`mt-3 shrink-0 pb-1 text-center text-[10px] ${colors.copyright}`}
+      >
         NASA Space Apps Challenge 2026
       </div>
     </aside>
