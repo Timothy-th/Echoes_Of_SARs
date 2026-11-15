@@ -341,7 +341,7 @@ const NDVIComparisonMap = () => {
                   aria-pressed={basemap === value}
                   className={`rounded-lg border px-2 py-2 text-[11px] font-medium ${basemap === value ? "border-emerald-600 bg-emerald-600 text-white" : button}`}
                 >
-                  {value === "street" ? "OpenStreetMap" : "Satellite"}
+                  {value === "street" ? "StreetMap" : "Satellite"}
                 </button>
               ))}
             </div>
@@ -404,14 +404,11 @@ const NDVIComparisonMap = () => {
             Source 2026: {metadata2026.source}
           </div>
         </aside>
-        <div
-          ref={shellRef}
-          className="relative h-[min(68vh,620px)] min-h-[390px]"
-        >
+        <div ref={shellRef} className="relative h-[min(68vh,620px)] min-h-97.5">
           <div ref={mapElementRef} className="z-0 h-full w-full" />
           {mode === "swipe" && (
             <div
-              className="pointer-events-none absolute inset-y-0 z-[500]"
+              className="pointer-events-none absolute inset-y-0 z-500"
               style={{ left: `${swipePercent}%` }}
             >
               <div className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_8px_#0008]" />
@@ -456,24 +453,25 @@ const NDVIComparisonMap = () => {
             </div>
           )}
           {mode !== "2026" && (
-            <span className="pointer-events-none absolute left-3 top-3 z-[450] rounded-lg border border-white/20 bg-slate-950/80 px-3 py-2 text-[10px] font-bold tracking-wide text-white">
+            <span className="comparison-date-label comparison-date-left">
               APRIL 2020
             </span>
           )}
+
           {mode !== "2020" && (
-            <span className="pointer-events-none absolute right-3 top-3 z-[450] rounded-lg border border-white/20 bg-slate-950/80 px-3 py-2 text-[10px] font-bold tracking-wide text-white">
+            <span className="comparison-date-label comparison-date-right">
               APRIL 2026
             </span>
           )}
           {error && (
             <p
               role="alert"
-              className="absolute left-3 right-3 top-14 z-[600] rounded-lg border border-rose-400/40 bg-rose-950/90 p-3 text-xs text-white"
+              className="absolute left-3 right-3 top-14 z-600 rounded-lg border border-rose-400/40 bg-rose-950/90 p-3 text-xs text-white"
             >
               {error}
             </p>
           )}
-          <p className="pointer-events-none absolute bottom-3 left-1/2 z-[450] -translate-x-1/2 rounded-lg border border-white/20 bg-slate-950/80 px-3 py-2 text-[10px] text-white">
+          <p className="ndvi-comparison-hint">
             Click map to compare both NDVI values and their difference
           </p>
         </div>
